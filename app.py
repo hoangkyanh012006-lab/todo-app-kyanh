@@ -17,12 +17,15 @@ BACKEND_URL = "http://127.0.0.1:8000"
 # ==========================================
 # THỦ THUẬT BẮC CẦU: BẮT VÉ TỪ GOOGLE
 # ==========================================
-params = st.experimental_get_query_params()
+# ==========================================
+# THỦ THUẬT BẮC CẦU: BẮT VÉ TỪ GOOGLE
+# ==========================================
+# Code mới cho phiên bản Streamlit mới nhất trên Cloud
+params = st.query_params
 if "token" in params:
     # Nếu thấy vé trên thanh URL, lập tức cất vào túi và xóa URL đi cho sạch
-    st.session_state['userToken'] = params["token"][0]
-    st.experimental_set_query_params()
-
+    st.session_state['userToken'] = params["token"]
+    st.query_params.clear()
 # --- ĐIỀN API KEY CỦA EM VÀO ĐÂY ---
 firebaseConfig = {
     "apiKey": "AIzaSyC0a_5qhZYUW5msHxBjnmoFZKAtkQVuhaA",
