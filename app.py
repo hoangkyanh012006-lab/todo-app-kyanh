@@ -81,22 +81,9 @@ if st.session_state['userToken'] is None:
         
         google_login_html = f"""
                 <html>
-                    <head>
-                        <style>
-                            .g-btn {{
-                                background-color: #ffffff; color: #757575; padding: 10px 15px;
-                                border: 1px solid #ddd; border-radius: 5px; cursor: pointer;
-                                font-family: Roboto, sans-serif; font-size: 15px; width: 100%;
-                                font-weight: bold; box-shadow: 0 2px 4px 0 rgba(0,0,0,.25);
-                                display: flex; align-items: center; justify-content: center;
-                            }}
-                            .g-btn:hover {{ background-color: #f5f5f5; }}
-                            .g-btn img {{ width: 20px; margin-right: 10px; }}
-                        </style>
-                    </head>
                     <body>
-                        <button id="gbtn" class="g-btn">
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo"/>
+                        <button id="gbtn" style="background-color: #ffffff; color: #757575; padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; font-family: Roboto, sans-serif; font-size: 15px; width: 100%; font-weight: bold; box-shadow: 0 2px 4px 0 rgba(0,0,0,.25); display: flex; align-items: center; justify-content: center;">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width: 20px; margin-right: 10px;"/>
                             Tiếp tục với Google
                         </button>
                         <script type="module">
@@ -108,19 +95,21 @@ if st.session_state['userToken'] is None:
                                 authDomain: "{firebaseConfig['authDomain']}",
                                 projectId: "{firebaseConfig['projectId']}"
                             }};
+                            
                             const app = initializeApp(firebaseConfig);
                             const auth = getAuth(app);
                             const provider = new GoogleAuthProvider();
 
                             document.getElementById('gbtn').addEventListener('click', () => {{
+                                // Sử dụng auth đã khai báo, không dùng fireauth
                                 signInWithPopup(auth, provider).then((result) => {{
                                     result.user.getIdToken().then((token) => {{
-                                        // Gửi token về trang cha bằng URL hiện tại
-                                        const parentUrl = new URL(window.parent.location.href);
-                                        parentUrl.searchParams.set("token", token);
-                                        window.parent.location.href = parentUrl.toString();
+                                        const currentUrl = new URL(window.parent.location.href);
+                                        currentUrl.searchParams.set("token", token);
+                                        window.parent.location.href = currentUrl.toString();
                                     }});
                                 }}).catch((error) => {{
+                                    console.error("Lỗi:", error);
                                     alert("Lỗi đăng nhập: " + error.message);
                                 }});
                             }});
