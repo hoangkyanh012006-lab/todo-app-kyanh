@@ -40,11 +40,13 @@ if 'userToken' not in st.session_state:
 
 st.title("📌 ToDo - Quản lý & Chia sẻ")
 
+
 def check_password_strength(password):
     if len(password) < 6: return False
     if not re.search(r"[A-Z]", password): return False
     if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password): return False
     return True
+
 
 # ==========================================
 # GIAO DIỆN CHƯA ĐĂNG NHẬP
@@ -79,7 +81,7 @@ if st.session_state['userToken'] is None:
 
     with tab3:
         st.info("Nhấp vào nút dưới đây để xác thực qua tài khoản Google.")
-        
+
         # ĐOẠN MÃ GOOGLE LOGIN (Đã sửa lỗi fireauth và origin)
         google_login_html = f"""
         <html>
@@ -91,13 +93,13 @@ if st.session_state['userToken'] is None:
                 <script type="module">
                     import {{ initializeApp }} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
                     import {{ getAuth, signInWithPopup, GoogleAuthProvider }} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-                    
+
                     const firebaseConfig = {{
                         apiKey: "{firebaseConfig['apiKey']}",
                         authDomain: "{firebaseConfig['authDomain']}",
                         projectId: "{firebaseConfig['projectId']}"
                     }};
-                    
+
                     const app = initializeApp(firebaseConfig);
                     const auth = getAuth(app); 
                     const provider = new GoogleAuthProvider();
@@ -158,6 +160,7 @@ else:
             shared_with_me = [t for t in todos if t.get('is_shared')]
             tasks_i_shared = [t for t in todos if len(t.get('shared_with', [])) > 0 and not t.get('is_shared')]
 
+
             def render_task_list(task_list, is_owner_view=True):
                 if not task_list:
                     st.info("Trống! Không có công việc nào.")
@@ -179,12 +182,13 @@ else:
                             st.info(f"📝 {todo['title']}")
                     with col_status:
                         st.write("🟢 Xong" if todo['completed'] else "🔴 Chưa xong")
-                    
+
                     with st.expander("Chi tiết & Thao tác"):
                         if todo.get('notes'): st.markdown(f"*{todo['notes']}*")
                         c1, c2 = st.columns(2)
                         if c1.button("✅/🔄", key=f"up_{todo['id']}"):
-                            requests.put(f"{BACKEND_URL}/todos/{todo['id']}?completed={not todo['completed']}", headers=headers)
+                            requests.put(f"{BACKEND_URL}/todos/{todo['id']}?completed={not todo['completed']}",
+                                         headers=headers)
                             st.rerun()
                         if is_owner_view:
                             if c2.button("🗑️ Xóa", key=f"del_{todo['id']}"):
@@ -194,13 +198,18 @@ else:
                             c_mail, c_share = st.columns([0.7, 0.3])
                             share_email = c_mail.text_input("Chia sẻ tới Email:", key=f"mail_{todo['id']}")
                             if c_share.button("Gửi", key=f"share_{todo['id']}"):
-                                requests.post(f"{BACKEND_URL}/todos/{todo['id']}/share", json={"email": share_email}, headers=headers)
+                                requests.post(f"{BACKEND_URL}/todos/{todo['id']}/share", json={"email": share_email},
+                                              headers=headers)
                                 st.rerun()
                     st.markdown('</div>', unsafe_allow_html=True)
 
+
             t1, t2, t3 = st.tabs(["🧑‍💻 Việc của tôi", "🤝 Được chia sẻ", "📤 Đã chia sẻ"])
-            with t1: render_task_list(my_private_tasks)
-            with t2: render_task_list(shared_with_me, is_owner_view=False)
-            with t3: render_task_list(tasks_i_shared)
+            with t1:
+                render_task_list(my_private_tasks)
+            with t2:
+                render_task_list(shared_with_me, is_owner_view=False)
+            with t3:
+                render_task_list(tasks_i_shared)
     except Exception as e:
         st.error(f"Không thể kết nối Backend tại {BACKEND_URL}. Hãy đảm bảo Backend đang chạy!")
